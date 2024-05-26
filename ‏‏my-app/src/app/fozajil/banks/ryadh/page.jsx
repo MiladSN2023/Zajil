@@ -1,6 +1,6 @@
 "use client"
 
-import styles from './rajhe.module.css'
+import styles from './ryadh.module.css'
 import Image from 'next/image'
 import icon1 from '../../../../../public/4.png'
 import { useState } from 'react'
