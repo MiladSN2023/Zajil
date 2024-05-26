@@ -1,3 +1,5 @@
+"use client"
+
 import styles from './rajhe.module.css'
 import Image from 'next/image'
 import icon1 from '../../../../../public/11.jpg'
