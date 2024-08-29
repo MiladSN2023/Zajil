@@ -1,0 +1,104 @@
+implementation "com.squareup.retrofit2:retrofit:2.9.0"
+implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+
+إنشاء واجهة API:
+
+قم بإنشاء واجهة تحتوي على تعريفات لمكالمات API. استخدم تعيين @GET لتحديد طلب GET.
+
+
+import retrofit2.http.GET
+import retrofit2.http.Path
+
+interface ApiService {
+    @GET("endpoint/{id}")
+    suspend fun getItem(@Path("id") id: String): ApiResponse
+}
+
+
+
+استبدل "endpoint/{id}" بالمسار المناسب لطلبك، وApiResponse بالبيانات التي تتوقع تلقيها من API.
+
+إنشاء Retrofit Instance:
+
+قم بإنشاء كائن Retrofit لتكوين طلباتك
+
+import retrofit2.http.GET
+import retrofit2.http.Path
+
+interface ApiService {
+    @GET("endpoint/{id}")
+    suspend fun getItem(@Path("id") id: String): ApiResponse
+}
+
+
+يمكنك استخدام Retrofit داخل ViewModel باستخدام Coroutines لتشغيل طلبات الشبكة بشكل غير متزامن.
+
+
+
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+object RetrofitInstance {
+    private const val BASE_URL = "https://yourapiurl.com/"
+
+    val api: ApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiService::class.java)
+    }
+}
+
+
+
+
+في Activity أو Fragment، يمكنك الحصول على البيانات من ViewModel وتحديث واجهة المستخدم.
+
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+
+class MyViewModel : ViewModel() {
+    fun fetchItem(id: String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.getItem(id)
+                // تعامل مع الاستجابة هنا
+            } catch (e: Exception) {
+                // تعامل مع الخطأ هنا
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+
+class MainActivity : AppCompatActivity() {
+    private val viewModel: MyViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        viewModel.fetchItem("someId")
+
+        // يمكنك المراقبة هنا للبيانات المسترجعة وتحديث واجهة المستخدم
+    }
+}
+
+
+
+
+
